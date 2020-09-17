@@ -29,8 +29,27 @@
               <%= @book_s.user.name %>
               <% end %>
             </td>
-            <td style="width:20%"><%= @book_s.title %></td>
-            <td style="width:50%"><%= @book_s.body %></td>
+            <td style="width:10%"><%= @book_s.title %></td>
+            <td style="width:30%"><%= @book_s.body %></td>
+
+            <% if @book_s.favorited_by?(current_user) %>
+            <td style="width:10%">
+              <%= link_to book_favorites_path(@book_s), method: :delete do %>
+              <span class="glyphicon glyphicon-heart" style="color: red;"></span>
+              <%= @book_s.favorites.count %>
+              <% end %>
+            </td>
+            <% else %>
+            <td style="width:10%">
+              <%= link_to book_favorites_path(@book_s), method: :post do %>
+              <span class="glyphicon glyphicon-heart-empty"></span>
+              <%= @book_s.favorites.count %>
+              <% end %>
+            </td>
+            <% end %>
+
+            <td style="width:20%">コメント数：<%= @book_s.post_comments.count %></td>
+
             <% if @book_s.user == current_user %>
             <td style="width:10%">
               <%= link_to edit_book_path(@book_s) do %>
@@ -46,6 +65,35 @@
           </tr>
         </tbody>
       </table>
+      <table class="">
+        <tbody>
+          <% @book_s.post_comments.each do |post_comment| %>
+          <tr>
+            <td style="width:8%">          <%= link_to user_path(@book_s.user.id) do %>
+              <%= attachment_image_tag post_comment.user, :profile_image, :fill, 40, 40, fallback: "no_image.jpg", class: "pull-left profile-thumb" %>
+              <%= post_comment.user.name %>
+              <% end %>
+            </td>
+            <td style="width:82%">          <span class="comment-date"><%= post_comment.created_at.strftime('%Y/%m/%d') %></span>
+              <div class="comment-entry"><%= post_comment.comment %></div>
+            </td>
+            <% if post_comment.user == current_user %>
+            <td style="width:10%">
+              <%= link_to "Destroy", book_post_comment_path(post_comment.book, post_comment), method: :delete, class: "btn btn-danger" %>
+              <% end %>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%= form_for [@book_s, @post_comment] do |f| %>
+      <div class="row">
+        <div class="col-sm-12">
+          <%= f.text_area :comment, rows:'2', class: "form-control",placeholder: "コメント" %>
+        </div>
+      </div>
+      <%= f.submit "送信", class: "btn" %>
+      <% end %>
     </div>
   </div>
 </div>

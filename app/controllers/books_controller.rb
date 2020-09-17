@@ -20,10 +20,7 @@ end
     @book = Book.new
     @user = User.find(current_user.id)
     @book_s = Book.find(params[:id])
-  end
-
-  def new
-    @book = Book.new
+    @post_comment = PostComment.new
   end
 
   def create
